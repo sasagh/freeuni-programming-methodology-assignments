@@ -10,7 +10,6 @@ import java.awt.*;
 
 public class HangmanCanvas extends GCanvas {
 
-	/** Resets the display so that only the scaffold/beam/rope/hint appears */
 	public void reset() {
 		removeAll();
 		initializeInstanceVariables();
@@ -164,7 +163,7 @@ public class HangmanCanvas extends GCanvas {
 	}
 
 
-	/* Constants for the simple version of the picture (in pixels) */
+	/* Constants */
 	private static final int SCAFFOLD_HEIGHT = 360;
 	private static final int BEAM_LENGTH = 144;
 	private static final int ROPE_LENGTH = 18;
