@@ -36,8 +36,7 @@ public class HangmanLexicon {
 	}
 
 /** Returns the word at the specified index. */
-	public String getWord() {
-		int index = RandomGenerator.getInstance().nextInt(0, getWordCount()-1);
+	public String getWord(int index) {
 		return words.get(index);
 	};
 }

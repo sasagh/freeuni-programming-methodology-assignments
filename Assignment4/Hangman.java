@@ -1,4 +1,5 @@
 import acm.program.*;
+import acm.util.RandomGenerator;
 
 public class Hangman extends ConsoleProgram {
     private static final int LIVES = 8;
@@ -42,7 +43,10 @@ public class Hangman extends ConsoleProgram {
 
     /** Initialize word */
     private void initializeWord(){
-        word = new HangmanLexicon().getWord();
+        HangmanLexicon lexicon = new HangmanLexicon();
+        int index = RandomGenerator.getInstance().nextInt(0, lexicon.getWordCount()-1);
+
+        word = lexicon.getWord(index);
         wordCharactersEntered = new boolean[word.length()];
         remainedCharactersToGuess = word.length();
     }
