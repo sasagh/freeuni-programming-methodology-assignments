@@ -8,6 +8,9 @@
 
 public interface NameSurferConstants {
 
+/** The margin of label text */
+	public static final int LABEL_TEXT_MARGIN = 3;
+
 /** The width of the application window */
 	public static final int APPLICATION_WIDTH = 800;
 

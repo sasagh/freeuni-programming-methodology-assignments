@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 public class NameSurferDataBase implements NameSurferConstants {
-	Hashtable<String, NameSurferEntry> namesAndRanks;
+	private final Hashtable<String, NameSurferEntry> namesAndRanks;
 /* Constructor: NameSurferDataBase(filename) */
 /**
  * Creates a new NameSurferDataBase and initializes it using the

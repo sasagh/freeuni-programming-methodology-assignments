@@ -13,27 +13,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.*;
 
-public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
+public class NameSurfer extends Program implements NameSurferConstants {
 	private JTextField nameInput;
 	private JButton graphBtn;
 	private JButton clearBtn;
+	private NameSurferGraph graph;
+	private NameSurferDataBase db;
 /* Method: init() */
 /**
  * This method has the responsibility for reading in the data base
  * and initializing the interactors at the bottom of the window.
  */
 	public void init() {
+		graph = new NameSurferGraph();
+		db = new NameSurferDataBase(NAMES_DATA_FILE);
+		add(graph);
 		initializeObjectsAndAddActionListeners();
-		NameSurferDataBase db = new NameSurferDataBase("names-data.txt");
-
-		println(db.findEntry("sAlVadoR").toString());
-		println(db.findEntry("Samantha").toString());
 	}
 
 	private void initializeObjectsAndAddActionListeners(){
 		JLabel label = new JLabel("Name");
 		add(label, SOUTH);
-		nameInput = new JTextField(20);
+		nameInput = new JTextField(15);
 		nameInput.setActionCommand("Graph");
 		add(nameInput, SOUTH);
 		graphBtn = new JButton("Graph");
@@ -55,10 +56,15 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 			case "Graph" -> {
-				println("Graph " + nameInput.getText());
+				NameSurferEntry entry = db.findEntry(nameInput.getText());
+				if(entry != null){
+					graph.addEntry(entry);
+				}
 				nameInput.setText("");
 			}
-			case "Clear" -> println("Clear");
+			case "Clear" -> {
+				graph.clear();
+			}
 		}
 	}
 }

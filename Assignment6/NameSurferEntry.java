@@ -6,12 +6,11 @@
  * of that name for each decade stretching back to 1900.
  */
 
-import acm.util.*;
 import java.util.*;
 
 public class NameSurferEntry implements NameSurferConstants {
-	private String name;
-	private int[] ranks;
+	private final String name;
+	private final int[] ranks;
 /* Constructor: NameSurferEntry(line) */
 /**
  * Creates a new NameSurferEntry from a data line as it appears
@@ -20,7 +19,7 @@ public class NameSurferEntry implements NameSurferConstants {
  * decade.
  */
 	public NameSurferEntry(String line) {
-		ranks = new int[11];
+		ranks = new int[NDECADES];
 		String[] entries = line.split(" ");
 		name = entries[0];
 
@@ -60,10 +59,6 @@ public class NameSurferEntry implements NameSurferConstants {
 		if(name == null) return "";
 
 		return name + " " +Arrays.toString(ranks);
-	}
-
-	public int[] getRanks(){
-		return ranks;
 	}
 }
 
