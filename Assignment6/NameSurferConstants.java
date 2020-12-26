@@ -10,6 +10,7 @@ public interface NameSurferConstants {
 
 /** The width of text field interactor */
 	public static final int TEXT_FIELD_SIZE = 15;
+
 /** The margin of label text */
 	public static final int LABEL_TEXT_MARGIN = 3;
 
@@ -33,5 +34,4 @@ public interface NameSurferConstants {
 
 /** The number of pixels to reserve at the top and bottom */
 	public static final int GRAPH_MARGIN_SIZE = 20;
-
 }

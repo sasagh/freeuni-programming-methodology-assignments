@@ -17,6 +17,7 @@ public class NameSurfer extends Program implements NameSurferConstants {
 	private JTextField nameInput;
 	private JButton graphBtn;
 	private JButton clearBtn;
+	private JButton deleteBtn;
 	private NameSurferGraph graph;
 	private NameSurferDataBase db;
 /* Method: init() */
@@ -39,14 +40,17 @@ public class NameSurfer extends Program implements NameSurferConstants {
 		nameInput.setActionCommand("Graph");
 		graphBtn = new JButton("Graph");
 		clearBtn = new JButton("Clear");
+		deleteBtn = new JButton("Delete");
 
 		add(label, SOUTH);
 		add(nameInput, SOUTH);
 		add(graphBtn, SOUTH);
+		add(deleteBtn, SOUTH);
 		add(clearBtn, SOUTH);
 
 		nameInput.addActionListener(this);
 		graphBtn.addActionListener(this);
+		deleteBtn.addActionListener(this);
 		clearBtn.addActionListener(this);
 	}
 
@@ -60,9 +64,12 @@ public class NameSurfer extends Program implements NameSurferConstants {
 		switch (e.getActionCommand()) {
 			case "Graph" -> {
 				NameSurferEntry entry = db.findEntry(nameInput.getText());
-				if(entry != null){
-					graph.addEntry(entry);
-				}
+				if(entry != null) graph.addEntry(entry);
+				nameInput.setText("");
+			}
+			case "Delete" -> {
+				NameSurferEntry entry = db.findEntry(nameInput.getText());
+				if(entry != null) graph.removeEntry(entry);
 				nameInput.setText("");
 			}
 			case "Clear" -> {

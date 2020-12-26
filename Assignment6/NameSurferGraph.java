@@ -15,6 +15,7 @@ public class NameSurferGraph extends GCanvas
 	implements NameSurferConstants, ComponentListener {
 
 	private HashMap<NameSurferEntry, Color> entries;
+	private static int fontSize;
 	/**
 	* Creates a new NameSurferGraph object that displays the data.
 	*/
@@ -44,6 +45,13 @@ public class NameSurferGraph extends GCanvas
 		update();
 	}
 
+	public void removeEntry(NameSurferEntry entry){
+		if(entries.get(entry) == null) return;
+
+		entries.remove(entry);
+		update();
+	}
+
 	/**
 	* Updates the display image by deleting all the graphical objects
 	* from the canvas and then reassembling the display according to
@@ -53,9 +61,15 @@ public class NameSurferGraph extends GCanvas
 	*/
 	public void update() {
 		removeAll();
+		adjustFontSize();
 		drawHorizontalLines();
 		drawVerticalLinesAndAddYearLabels();
 		drawGraphs();
+	}
+
+	/** Adjusts font size according to window's width */
+	private void adjustFontSize(){
+		fontSize = getWidth() > 800 ? 800/60 : getWidth()/60;
 	}
 
 	/** Draws graphs for names which present in entries' collection */
@@ -104,6 +118,7 @@ public class NameSurferGraph extends GCanvas
 		String labelText = name + (rank == 0 ? " *" : " " + rank);
 		GLabel label = new GLabel(labelText);
 		label.setColor(entries.get(entry));
+		setFontForLabel(label);
 		y += rank == 0 ? 0 : label.getAscent();
 		add(label,decadeIndex * getWidth()*1.0/NDECADES + LABEL_TEXT_MARGIN, y - LABEL_TEXT_MARGIN);
 	}
@@ -143,7 +158,10 @@ public class NameSurferGraph extends GCanvas
 			double lineX = i * getWidth()*1.0/NDECADES;
 			double labelX = (i-1) * getWidth()*1.0/NDECADES + LABEL_TEXT_MARGIN;
 			add(new GLine(lineX, 0, lineX, getHeight()));
-			add(new GLabel(""+(START_DECADE+10*(i-1))), labelX, getHeight() - LABEL_TEXT_MARGIN);
+
+			GLabel label = new GLabel(""+(START_DECADE+10*(i-1)));
+			setFontForLabel(label);
+			add(label, labelX, getHeight() - LABEL_TEXT_MARGIN);
 		}
 	}
 
@@ -155,7 +173,11 @@ public class NameSurferGraph extends GCanvas
 		add(topLine);
 		add(bottomLine);
 	}
-	
+
+	/** Sets font for given label */
+	private void setFontForLabel(GLabel label){
+		label.setFont(new Font("Sans-serif", Font.PLAIN, fontSize));
+	}
 	
 	/* Implementation of the ComponentListener interface */
 	public void componentHidden(ComponentEvent e) { }
