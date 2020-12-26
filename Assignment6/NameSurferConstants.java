@@ -8,6 +8,7 @@
 
 public interface NameSurferConstants {
 
+/** The width of text field interactor */
 	public static final int TEXT_FIELD_SIZE = 15;
 /** The margin of label text */
 	public static final int LABEL_TEXT_MARGIN = 3;

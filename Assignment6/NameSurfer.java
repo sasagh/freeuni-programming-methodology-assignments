@@ -28,10 +28,11 @@ public class NameSurfer extends Program implements NameSurferConstants {
 		graph = new NameSurferGraph();
 		add(graph);
 		db = new NameSurferDataBase(NAMES_DATA_FILE);
-		initializeObjectsAndAddActionListeners();
+		initializeInteractorsAndAddActionListeners();
 	}
 
-	private void initializeObjectsAndAddActionListeners(){
+	/** Initializes interactors which should be present on window */
+	private void initializeInteractorsAndAddActionListeners(){
 		JLabel label = new JLabel("Name");
 
 		nameInput = new JTextField(TEXT_FIELD_SIZE);
