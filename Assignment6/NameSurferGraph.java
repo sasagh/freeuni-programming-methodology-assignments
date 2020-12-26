@@ -14,22 +14,20 @@ import java.awt.*;
 public class NameSurferGraph extends GCanvas
 	implements NameSurferConstants, ComponentListener {
 
-	private Hashtable<NameSurferEntry, Color> entries;
-	private static int graphCount = 0;
+	private HashMap<NameSurferEntry, Color> entries;
 	/**
 	* Creates a new NameSurferGraph object that displays the data.
 	*/
 	public NameSurferGraph() {
 		addComponentListener(this);
-		entries = new Hashtable<>();
+		entries = new HashMap<>();
 	}
 	
 	/**
 	* Clears the list of name surfer entries stored inside this class.
 	*/
 	public void clear() {
-		entries = new Hashtable<>();
-		graphCount = 0;
+		entries = new HashMap<>();
 		update();
 	}
 	
@@ -40,8 +38,9 @@ public class NameSurferGraph extends GCanvas
 	* simply stores the entry; the graph is drawn by calling update.
 	*/
 	public void addEntry(NameSurferEntry entry) {
+		if(entries.get(entry) != null) return;
+
 		entries.put(entry, getColor());
-		graphCount++;
 		update();
 	}
 
@@ -59,6 +58,7 @@ public class NameSurferGraph extends GCanvas
 		drawGraphs();
 	}
 
+	/** Draws graphs for names which present in entries' collection */
 	private void drawGraphs() {
 		for(int i=0; i<entries.size(); i++){
 			for (int j = 0; j < NDECADES; j++) {
@@ -73,6 +73,7 @@ public class NameSurferGraph extends GCanvas
 		}
 	}
 
+	/** Draws graph and puts label for specific entry */
 	private void drawGraphAndLabel(int decadeIndex, NameSurferEntry entry, Integer nextRank){
 		double currentY, nextY;
 		int rank = entry.getRank(decadeIndex);
@@ -95,6 +96,7 @@ public class NameSurferGraph extends GCanvas
 		drawNameLabel(decadeIndex, entry, currentY);
 	}
 
+	/** Puts entry's name label on a canvas */
 	private void drawNameLabel(int decadeIndex, NameSurferEntry entry, double y){
 		String name = entry.getName();
 		int rank = entry.getRank(decadeIndex);
@@ -106,6 +108,7 @@ public class NameSurferGraph extends GCanvas
 		add(label,decadeIndex * getWidth()*1.0/NDECADES + LABEL_TEXT_MARGIN, y - LABEL_TEXT_MARGIN);
 	}
 
+	/** Draws graph on a canvas */
 	private void drawGraph(int decadeIndex, double startY, double endY, Color color){
 		GLine line = new GLine(
 				decadeIndex * getWidth()*1.0/NDECADES,
@@ -116,8 +119,9 @@ public class NameSurferGraph extends GCanvas
 		add(line);
 	}
 
+	/** Get color for specific entry */
 	private Color getColor(){
-		switch (graphCount%4){
+		switch (entries.size()%4){
 			case 0 -> {
 				return Color.BLACK;
 			}
@@ -128,11 +132,12 @@ public class NameSurferGraph extends GCanvas
 				return Color.BLUE;
 			}
 			default -> {
-				return Color.GREEN;
+				return Color.CYAN;
 			}
 		}
 	}
 
+	/** Draws vertical lines on a canvas and adds year labels */
 	private void drawVerticalLinesAndAddYearLabels(){
 		for(int i=0; i<=NDECADES; i++){
 			double lineX = i * getWidth()*1.0/NDECADES;
@@ -141,10 +146,12 @@ public class NameSurferGraph extends GCanvas
 			add(new GLabel(""+(START_DECADE+10*(i-1))), labelX, getHeight() - LABEL_TEXT_MARGIN);
 		}
 	}
-	
+
+	/** Draws Horizontal lines o canvas */
 	private void drawHorizontalLines(){
 		GLine topLine = new GLine(0, GRAPH_MARGIN_SIZE, getWidth(), GRAPH_MARGIN_SIZE);
-		GLine bottomLine = new GLine(0, getHeight()-GRAPH_MARGIN_SIZE, getWidth(), getHeight()-GRAPH_MARGIN_SIZE);
+		GLine bottomLine =
+				new GLine(0, getHeight()-GRAPH_MARGIN_SIZE, getWidth(), getHeight()-GRAPH_MARGIN_SIZE);
 		add(topLine);
 		add(bottomLine);
 	}
