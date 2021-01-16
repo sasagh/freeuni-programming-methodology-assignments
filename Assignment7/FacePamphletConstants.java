@@ -82,14 +82,26 @@ public interface FacePamphletConstants {
 	public static final String CHANGE_PICTURE_COMMAND = "Change Picture";
 	public static final String ADD_FRIEND_COMMAND = "Add Friend";
 
-	public static final String MESSAGE_PROFILE_NOT_FOUND = "There is no profile with this name";
-	public static final String MESSAGE_NO_PROFILE_ACTIVE = "Currently no profile is active, please choose one";
-	public static final String MESSAGE_ALREADY_FRIEND = "Profile with this name already is a friend of active profile";
-	public static final String MESSAGE_BAD_REQUEST = "Input should not be empty";
-	public static final String MESSAGE_DELETE = "Deleted successfully";
-	public static final String MESSAGE_ADD = "Added successfully";
-	public static final String MESSAGE_UPDATE = "Updated successfully";
-	public static final String MESSAGE_SUCCESS = "Operation completed successfully";
+	public static final String MESSAGE_BAD_REQUEST = "Input must not be empty";
+
+	public static final String MESSAGE_ADD = "A new profile created";
+	public static final String MESSAGE_UPDATE = "A Profile with name <NAME> already exists";
+	public static final String MESSAGE_DELETE = "Profile of <NAME> deleted";
+	public static final String MESSAGE_LOOKUP = "Displaying <NAME>";
+
+	public static final String MESSAGE_CHANGE_STATUS_SUCCESS = "Status updated to <STATUS>";
+	public static final String MESSAGE_CHANGE_STATUS_NO_ACTIVE_PROFILE = "Please select a profile to change status";
+
+	public static final String MESSAGE_CHANGE_PICTURE_SUCCESS = "Picture updated";
+	public static final String MESSAGE_CHANGE_PICTURE_ERROR = "Unable to open image file: <FILENAME>";
+	public static final String MESSAGE_CHANGE_PICTURE_NO_ACTIVE_PROFILE = "Please select a profile to change picture";
+
+	public static final String MESSAGE_ADD_FRIEND_SUCCESS = "<FRIEND_NAME> added as a friend";
+	public static final String MESSAGE_ADD_FRIEND_NO_ACTIVE_PROFILE = "Please select a profile to add a friend";
+	public static final String MESSAGE_ADD_FRIEND_ALREADY_FRIEND = "<NAME> already has <FRIEND_NAME> as a friend";
+	public static final String MESSAGE_ADD_FRIEND_SELF_FRIENDSHIP = "A profile can not be a friend of itself";
+
+	public static final String MESSAGE_PROFILE_NOT_FOUND = "A profile with name <NAME> does not exist";
 
 	public static enum Status{
 		Success, Add, Update, Delete, NotFound, BadRequest

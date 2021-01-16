@@ -31,7 +31,6 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 
 		if(profiles.get(name) == null){
 			profiles.put(name, profile);
-
 			response.status = Status.Add;
 		}else{
 			profiles.compute(
@@ -54,6 +53,12 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 		FacePamphletProfile profile = profiles.get(name);
 
 		Response<Status, FacePamphletProfile> response = new Response<>();
+
+		if(name.isBlank()) {
+			response.status = Status.BadRequest;
+			return response;
+		}
+
 		response.data = profile;
 		response.status = profile == null ? Status.NotFound : Status.Success;
 

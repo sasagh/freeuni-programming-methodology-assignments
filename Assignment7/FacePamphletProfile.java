@@ -68,12 +68,10 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * a second time.)
 	 */
 	public boolean addFriend(FacePamphletProfile profile) {
-		if(friendList.get(profile.name) == null) {
-			friendList.put(profile.name, profile);
-			return true;
-		}
+		if(profile == null || friendList.get(profile.name) != null) return false;
 
-		return false;
+		friendList.put(profile.name, profile);
+		return true;
 	}
 
 	/** 

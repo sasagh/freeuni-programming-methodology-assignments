@@ -9,11 +9,10 @@ import acm.program.*;
 import acm.graphics.*;
 import acm.util.*;
 import java.awt.event.*;
-import java.io.Console;
 import java.util.Iterator;
 import javax.swing.*;
 
-public class FacePamphlet extends ConsoleProgram
+public class FacePamphlet extends Program
 					implements FacePamphletConstants {
 	private JLabel nameLabel;
 	private JTextField nameTextField;
@@ -29,6 +28,7 @@ public class FacePamphlet extends ConsoleProgram
 	private FacePamphletProfile currentProfile;
 
 	private static FacePamphletDatabase db;
+	private FacePamphletCanvas canvas;
 
 	/**
 	 * This method has the responsibility for initializing the 
@@ -37,6 +37,8 @@ public class FacePamphlet extends ConsoleProgram
 	 */
 	public void init() {
 		db = new FacePamphletDatabase();
+		canvas = new FacePamphletCanvas();
+		add(canvas);
 		initializeInteractors();
 		addActionCommandsToInteractors();
 		addActionListenersToInteractors();
@@ -109,8 +111,6 @@ public class FacePamphlet extends ConsoleProgram
      * to respond to these actions.
      */
     public void actionPerformed(ActionEvent event) {
-		print(event.getActionCommand() + ": \n");
-
 		switch (event.getActionCommand()){
 			case ADD_COMMAND -> actionAdd();
 			case DELETE_COMMAND -> actionDelete();
@@ -119,8 +119,6 @@ public class FacePamphlet extends ConsoleProgram
 			case CHANGE_PICTURE_COMMAND -> actionChangePicture();
 			case ADD_FRIEND_COMMAND -> actionAddFriend();
 		}
-
-		println("-----------------------------");
 	}
 
 	/** Method which is invoked when user press Add button"*/
@@ -133,13 +131,14 @@ public class FacePamphlet extends ConsoleProgram
 			return;
 		}
 
-		if(response.status == Status.Add){
-			getDialog().println(MESSAGE_ADD);
-		}else if(response.status == Status.Update){
-			getDialog().println(MESSAGE_UPDATE);
-		}
-
 		currentProfile = response.data;
+		canvas.displayProfile(currentProfile);
+
+		if(response.status == Status.Add){
+			canvas.showMessage(MESSAGE_ADD);
+		}else if(response.status == Status.Update){
+			canvas.showMessage(MESSAGE_UPDATE.replace("<NAME>", name));
+		}
 	}
 
 	/** Method which is invoked when user press Delete button */
@@ -147,8 +146,13 @@ public class FacePamphlet extends ConsoleProgram
 		String name = nameTextField.getText();
 		Response<Status, FacePamphletProfile> response = db.getProfile(name);
 
+		if(response.status == Status.BadRequest){
+			getDialog().println(MESSAGE_BAD_REQUEST);
+			return;
+		}
+
 		if(response.status == Status.NotFound){
-			getDialog().println(MESSAGE_PROFILE_NOT_FOUND);
+			canvas.showMessage(MESSAGE_PROFILE_NOT_FOUND.replace("<NAME>", name));
 			return;
 		}
 
@@ -157,14 +161,15 @@ public class FacePamphlet extends ConsoleProgram
 		while(friendNames.hasNext()){
 			FacePamphletProfile friendProfile = db.getProfile(friendNames.next()).data;
 
-			friendProfile.removeFriend(currentProfile.getName());
+			friendProfile.removeFriend(name);
 			db.addProfile(friendProfile);
 		}
 
 		db.deleteProfile(name);
-		getDialog().println(MESSAGE_DELETE);
-
 		currentProfile = null;
+		canvas.removeAll();
+
+		canvas.showMessage(MESSAGE_DELETE.replace("<NAME>", name));
 	}
 
 	/** Method which is invoked when user press Lookup button */
@@ -173,76 +178,89 @@ public class FacePamphlet extends ConsoleProgram
 		Response<Status, FacePamphletProfile> response = db.getProfile(name);
 
 		if(response.status == Status.NotFound){
-			getDialog().println(MESSAGE_PROFILE_NOT_FOUND);
+			canvas.removeAll();
+			canvas.showMessage(MESSAGE_PROFILE_NOT_FOUND.replace("<NAME>", name));
 			return;
 		}
 
-		handleStatus(response.status, response.data);
+		if(response.status == Status.BadRequest){
+			getDialog().println(MESSAGE_BAD_REQUEST);
+			return;
+		}
+
 		currentProfile = response.data;
+		canvas.displayProfile(currentProfile);
+		canvas.showMessage(MESSAGE_LOOKUP.replace("<NAME>", name));
 	}
 
 	/** Method which is invoked when user press Change Status button */
 	private void actionChangeStatus(){
 
 		if(currentProfile == null){
-			getDialog().println(MESSAGE_NO_PROFILE_ACTIVE);
+			canvas.showMessage(MESSAGE_CHANGE_STATUS_NO_ACTIVE_PROFILE);
 			return;
 		}
 
 		String status = changeStatusTextField.getText();
 
 		currentProfile.setStatus(status);
-		Response<Status, FacePamphletProfile> response = db.addProfile(currentProfile);
 
-		getDialog().println(MESSAGE_SUCCESS);
-
-		handleStatus(response.status, response.data);
+		db.addProfile(currentProfile);
+		canvas.displayProfile(currentProfile);
+		canvas.showMessage(MESSAGE_CHANGE_STATUS_SUCCESS.replace("<STATUS>", status));
 	}
 
 	/** Method which is invoked when user press Change Picture button */
 	private void actionChangePicture(){
 
 		if(currentProfile == null){
-			getDialog().println(MESSAGE_NO_PROFILE_ACTIVE);
+			canvas.showMessage(MESSAGE_CHANGE_PICTURE_NO_ACTIVE_PROFILE);
 			return;
 		}
-
-		String imagePath = changePictureTextField.getText();
-		GImage image = null;
+		String fileName = changePictureTextField.getText();
+		String imagePath = System.getProperty("user.dir") + "\\images\\" + fileName;
+		GImage image;
 
 		try {
 			image = new GImage(imagePath);
 		} catch (ErrorException ex) {
-			getDialog().println(MESSAGE_PROFILE_NOT_FOUND);
+			canvas.showMessage(MESSAGE_CHANGE_PICTURE_ERROR.replace("<FILENAME>", fileName));
+			return;
 		}
 
-		if(image != null){
-			currentProfile.setImage(image);
-			db.addProfile(currentProfile);
-			getDialog().println(MESSAGE_SUCCESS);
-		}
+		currentProfile.setImage(image);
+		db.addProfile(currentProfile);
+		canvas.displayProfile(currentProfile);
+		canvas.showMessage(MESSAGE_CHANGE_PICTURE_SUCCESS);
 	}
 
 	/** Method which is invoked when user press Add friend button */
 	private void actionAddFriend(){
 
 		if(currentProfile == null){
-			getDialog().println("Currently no profile is active, please choose one");
+			canvas.showMessage(MESSAGE_ADD_FRIEND_NO_ACTIVE_PROFILE);
 			return;
 		}
 
 		String friendName = addFriendTextField.getText();
 		Response<Status, FacePamphletProfile> response = db.getProfile(friendName);
 
-		if(response.status != Status.Success){
-			getDialog().println(MESSAGE_PROFILE_NOT_FOUND);
+		if(response.status == Status.NotFound){
+			canvas.showMessage(MESSAGE_PROFILE_NOT_FOUND.replace("<NAME>", friendName));
 			return;
 		}
 
 		FacePamphletProfile friendProfile = response.data;
 
+		if(currentProfile.getName().equals(friendName)){
+			getDialog().showErrorMessage(MESSAGE_ADD_FRIEND_SELF_FRIENDSHIP);
+			return;
+		}
+
 		if(currentProfile.isInFriendList(friendName)){
-			getDialog().println(MESSAGE_ALREADY_FRIEND);
+			canvas.showMessage(MESSAGE_ADD_FRIEND_ALREADY_FRIEND
+							.replace("<NAME>", currentProfile.getName())
+							.replace("<FRIEND_NAME>", friendName));
 			return;
 		}
 
@@ -252,17 +270,7 @@ public class FacePamphlet extends ConsoleProgram
 		db.addProfile(currentProfile);
 		db.addProfile(friendProfile);
 
-		getDialog().println(MESSAGE_SUCCESS);
-	}
-
-	private void handleStatus(Status status, FacePamphletProfile profile){
-    	switch (status){
-			case Success -> println("Success: " + profile.toString());
-			case Add -> println("Add: new profile: " + profile.toString());
-			case Update -> println("Update: profile already exists: " + profile.toString());
-			case Delete -> println("Deleted successfully");
-			case NotFound -> println("Profile with this name does not exist");
-			case BadRequest -> println("Name should not be empty");
-		}
+		canvas.displayProfile(currentProfile);
+		canvas.showMessage(MESSAGE_ADD_FRIEND_SUCCESS.replace("<FRIEND_NAME>", friendName));
 	}
 }
