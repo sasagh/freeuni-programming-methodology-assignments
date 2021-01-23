@@ -9,6 +9,7 @@ import acm.program.*;
 import acm.graphics.*;
 import acm.util.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.Iterator;
 import javax.swing.*;
 
@@ -223,9 +224,14 @@ public class FacePamphlet extends Program
 		GImage image;
 
 		try {
-			image = new GImage(imagePath);
+			if(new File(imagePath).isFile()){
+				image = new GImage(imagePath);
+			}else{
+				handleImageError(fileName);
+				return;
+			}
 		} catch (ErrorException ex) {
-			canvas.showMessage(MESSAGE_CHANGE_PICTURE_ERROR.replace("<FILENAME>", fileName));
+			handleImageError(fileName);
 			return;
 		}
 
@@ -233,6 +239,11 @@ public class FacePamphlet extends Program
 		db.addProfile(currentProfile);
 		canvas.displayProfile(currentProfile);
 		canvas.showMessage(MESSAGE_CHANGE_PICTURE_SUCCESS);
+
+	}
+
+	private void handleImageError(String fileName){
+		canvas.showMessage(MESSAGE_CHANGE_PICTURE_ERROR.replace("<FILENAME>", fileName));
 	}
 
 	/** Method which is invoked when user press Add friend button */
