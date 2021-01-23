@@ -10,6 +10,10 @@ public class FacePamphletCanvas extends GCanvas
 	private GImage image;
 	private GLabel status;
 
+	public FacePamphletCanvas(){
+		this.setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
+	}
+
 	/**
 	 * This method displays a message string near the bottom of the
 	 * canvas.  Every time this method is called, the previously
@@ -53,8 +57,7 @@ public class FacePamphletCanvas extends GCanvas
 
 	/** Displays image */
 	private void displayImage(FacePamphletProfile profile) {
-		image = profile.getImage();
-		if (image == null) {
+		if (profile.getImagePath() == null) {
 			GRect emptyRectangle = new GRect(IMAGE_WIDTH, IMAGE_HEIGHT);
 			add(emptyRectangle, LEFT_MARGIN, name.getY() + IMAGE_MARGIN);
 
@@ -67,6 +70,7 @@ public class FacePamphletCanvas extends GCanvas
 
 			add(emptyLabel, labelX, labelY);
 		} else {
+			image = new GImage(profile.getImagePath());
 			image.setBounds(LEFT_MARGIN, name.getY() + IMAGE_MARGIN, IMAGE_WIDTH, IMAGE_HEIGHT);
 			add(image);
 		}
@@ -93,9 +97,10 @@ public class FacePamphletCanvas extends GCanvas
 
 		double margin = 0;
 
-		Iterator<String> iterator = profile.getFriends();
+		Iterator<FacePamphletProfile> iterator = profile.getFriendList();
+
 		while(iterator.hasNext()) {
-			String friendName = iterator.next();
+			String friendName = iterator.next().getName();
 			GLabel friendLabel = new GLabel(friendName);
 			friendLabel.setFont(PROFILE_FRIEND_FONT);
 			add(friendLabel, getWidth()/2.0, friendsLabel.getY() + friendLabel.getHeight() + margin);
