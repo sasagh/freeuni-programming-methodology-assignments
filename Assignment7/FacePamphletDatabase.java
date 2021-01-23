@@ -6,7 +6,6 @@
  * sensitive, so that "ALICE" and "alice" are NOT the same name.
  */
 
-import java.lang.annotation.Repeatable;
 import java.util.*;
 
 public class FacePamphletDatabase implements FacePamphletConstants {
@@ -26,20 +25,12 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 			return response;
 		}
 
-		response.data = profile;
 		String name = profile.getName();
 
-		if(profiles.get(name) == null){
-			profiles.put(name, profile);
-			response.status = Status.Add;
-		}else{
-			profiles.compute(
-					name,
-					(key, value) -> value = profile
-			);
+		response.data = profile;
+		response.status = profiles.get(name) == null ? Status.Add : Status.Update;
 
-			response.status = Status.Update;
-		}
+		profiles.put(name, profile);
 
 		return response;
 	}

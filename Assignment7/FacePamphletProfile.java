@@ -67,11 +67,10 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * case, the given friend name is not added to the list of friends 
 	 * a second time.)
 	 */
-	public boolean addFriend(FacePamphletProfile profile) {
-		if(profile == null || friendList.get(profile.name) != null) return false;
+	public void addFriend(FacePamphletProfile profile) {
+		if(profile == null || friendList.get(profile.name) != null) return;
 
 		friendList.put(profile.name, profile);
-		return true;
 	}
 
 	/** 
@@ -82,15 +81,13 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * was not in the list of friends for this profile (in which case,
 	 * the given friend name could not be removed.)
 	 */
-	public boolean removeFriend(String name) {
+	public void removeFriend(String name) {
 		FacePamphletProfile friendInList = friendList.get(name);
 
 		if(friendInList != null) {
 			friendList.remove(name);
-			return true;
 		}
 
-		return false;
 	}
 
 	/**

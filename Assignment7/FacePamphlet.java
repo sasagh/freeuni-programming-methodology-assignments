@@ -180,6 +180,7 @@ public class FacePamphlet extends Program
 		if(response.status == Status.NotFound){
 			canvas.removeAll();
 			canvas.showMessage(MESSAGE_PROFILE_NOT_FOUND.replace("<NAME>", name));
+			currentProfile = null;
 			return;
 		}
 
