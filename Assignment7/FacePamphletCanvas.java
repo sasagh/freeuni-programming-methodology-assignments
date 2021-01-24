@@ -37,13 +37,13 @@ public class FacePamphletCanvas extends GCanvas
 	 * (or an indication that an image does not exist), the status of
 	 * the user, and a list of the user's friends in the social network.
 	 */
-	public void displayProfile(FacePamphletProfile profile) {
+	public void displayProfile(FacePamphletProfile profile, ArrayList<String> friends) {
 		removeAll();
 		if (profile == null) return;
 		displayName(profile);
 		displayImage(profile);
 		displayStatus(profile);
-		displayFriends(profile);
+		displayFriends(friends);
 	}
 
 	/** Displays name */
@@ -90,20 +90,17 @@ public class FacePamphletCanvas extends GCanvas
 	}
 
 	/** Displays friends */
-	private void displayFriends(FacePamphletProfile profile) {
+	private void displayFriends(ArrayList<String> friends) {
 		GLabel friendsLabel = new GLabel("Friends:");
 		friendsLabel.setFont(PROFILE_FRIEND_LABEL_FONT);
 		add(friendsLabel, getWidth()/2.0, name.getY() + IMAGE_MARGIN);
 
 		double margin = 0;
 
-		Iterator<FacePamphletProfile> iterator = profile.getFriendList();
-
-		while(iterator.hasNext()) {
-			String friendName = iterator.next().getName();
+		for (String friendName : friends) {
 			GLabel friendLabel = new GLabel(friendName);
 			friendLabel.setFont(PROFILE_FRIEND_FONT);
-			add(friendLabel, getWidth()/2.0, friendsLabel.getY() + friendLabel.getHeight() + margin);
+			add(friendLabel, getWidth() / 2.0, friendsLabel.getY() + friendLabel.getHeight() + margin);
 			margin += friendLabel.getHeight();
 		}
 	}

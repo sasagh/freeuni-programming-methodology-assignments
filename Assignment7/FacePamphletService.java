@@ -1,15 +1,17 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
 class FacePamphletService implements FacePamphletConstants{
-    private static FacePamphletDatabase db = new FacePamphletDatabase();
-    private static final String exportDirectory = System.getProperty("user.dir") + "\\database\\";
+    private static final FacePamphletDatabase db = new FacePamphletDatabase();
+    private static final String exportDirectory = System.getProperty("user.dir") + "\\";
     private static final String fileName = "database.dtb";
 
-    public static void exportProfiles(){
+    /** Method for exporting database */
+    public static boolean exportProfiles(){
         Hashtable<String, FacePamphletProfile> profiles = db.getProfiles();
         try {
             FileOutputStream fileOut = new FileOutputStream(exportDirectory + fileName);
@@ -17,27 +19,29 @@ class FacePamphletService implements FacePamphletConstants{
             out.writeObject(profiles);
             out.close();
             fileOut.close();
+            return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
     }
 
-    public static String importProfiles(){
-        Hashtable<String, FacePamphletProfile> profiles = null;
+    /** Method for importing database */
+    public static boolean importProfiles(){
+        Hashtable<String, FacePamphletProfile> profiles;
         try {
             FileInputStream fileIn = new FileInputStream(exportDirectory + fileName);
             ObjectInputStream in = new ObjectInputStream(fileIn);
             profiles = (Hashtable) in.readObject();
             in.close();
             fileIn.close();
+            db.setProfiles(profiles);
+            return true;
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            return false;
         }
-
-        db.setProfiles(profiles);
-        return profiles.toString();
     }
 
+    /** Method for registering */
     public static Response<Status, FacePamphletProfile> register(String name, String password){
         if(profileExists(name)) return alreadyExists();
 
@@ -49,6 +53,7 @@ class FacePamphletService implements FacePamphletConstants{
         return success(profile);
     }
 
+    /** Method for login */
     public static Response<Status, FacePamphletProfile> login(String name, String password){
         FacePamphletProfile profile = db.getProfileByName(name);
 
@@ -57,45 +62,67 @@ class FacePamphletService implements FacePamphletConstants{
         return isCredentialsCorrect(name, password, profile) ? success(profile) : incorrectPassword();
     }
 
+    /** Returns profile by name */
     public static Response<Status, FacePamphletProfile> getProfile(String name){
         FacePamphletProfile profile = db.getProfileByName(name);
 
         return profile != null ? success(profile) : notFound();
     }
 
+    /** Deletes profile */
     public static Response<Status, FacePamphletProfile> deleteProfile(FacePamphletProfile profile){
         Iterator<FacePamphletProfile> it = profile.getFriendList();
 
-        if(it != null){
-            while(it.hasNext()){
-                FacePamphletProfile friendProfile = it.next();
-                friendProfile.removeFriend(profile.getName());
-            }
+        while(it.hasNext()){
+            FacePamphletProfile friendProfile = it.next();
+            friendProfile.removeFriend(profile.getName());
+        }
+
+        it = profile.getSentRequests();
+
+        while(it.hasNext()){
+            FacePamphletProfile prof = it.next();
+            prof.removePendingRequest(profile);
+        }
+
+        it = profile.getPendingRequests();
+
+        while(it.hasNext()){
+            FacePamphletProfile prof = it.next();
+            prof.removeSentRequest(profile);
         }
 
         db.delete(profile.getName());
         return success();
     }
 
+    /** Method for sending friend request */
     public static void sendFriendRequest(FacePamphletProfile friendProfile, FacePamphletProfile userProfile){
-        friendProfile.addPendingRequest(userProfile.getName());
+        friendProfile.addPendingRequest(userProfile);
+        userProfile.addSentRequest(friendProfile);
     }
 
-    public static void cancelFriendRequest(FacePamphletProfile friendProfile, FacePamphletProfile userProfile){
-        friendProfile.removePendingRequest(userProfile.getName());
+    /** Method for canceling friend request */
+    public static void cancelFriendRequest(FacePamphletProfile currentProfile, FacePamphletProfile userProfile){
+        currentProfile.removePendingRequest(userProfile);
+        userProfile.removeSentRequest(currentProfile);
     }
 
+    /** Method for adding friend */
     public static void addFriend(FacePamphletProfile friendProfile, FacePamphletProfile userProfile){
         userProfile.addFriend(friendProfile);
         friendProfile.addFriend(userProfile);
-        userProfile.removePendingRequest(friendProfile.getName());
+        userProfile.removePendingRequest(friendProfile);
+        friendProfile.removeSentRequest(userProfile);
     }
 
+    /** Method for removing friend */
     public static void removeFriend(FacePamphletProfile friendProfile, FacePamphletProfile userProfile){
         userProfile.removeFriend(friendProfile.getName());
         friendProfile.removeFriend(userProfile.getName());
     }
 
+    /** Method for changing password */
     public static Response<Status, FacePamphletProfile> changePassword(String password, FacePamphletProfile profile){
         if(!isPasswordStrong(password)) return weakPassword();
         profile.setPassword(hashString(password));
@@ -103,6 +130,35 @@ class FacePamphletService implements FacePamphletConstants{
         return success(profile);
     }
 
+    /** Method for making friend list public */
+    public static void makeFriendListPublic(FacePamphletProfile profile){
+        profile.setIsFriendListPublic(true);
+    }
+
+    /** Method for making friend list private */
+    public static void makeFriendListPrivate(FacePamphletProfile profile){
+        profile.setIsFriendListPublic(false);
+    }
+
+    /** Method returns mutual friends of two profiles */
+    public static ArrayList<String>
+                        getMutualFriends(FacePamphletProfile currentProfile, FacePamphletProfile userProfile){
+        Iterator<FacePamphletProfile> it = userProfile.getFriendList();
+
+        ArrayList<String> mutualFriends = new ArrayList<>();
+
+        while(it.hasNext()){
+            FacePamphletProfile profile = it.next();
+
+            if(profile.isFriend(currentProfile)) {
+                mutualFriends.add(profile.getName());
+            }
+        }
+
+        return mutualFriends;
+    }
+
+    /** Method for hashing string */
     private static String hashString(String input){
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -121,20 +177,24 @@ class FacePamphletService implements FacePamphletConstants{
         }
     }
 
+    /** Method for checking credentials */
     private static boolean isCredentialsCorrect(String name, String password, FacePamphletProfile profile){
         return profile.getName().equals(name) && profile.getPasswordHash().equals(hashString(password));
     }
 
+    /** Method for checking if profile exists */
     private static boolean profileExists(String name){
         return db.getProfileByName(name) != null;
     }
 
+    /** Method for checking if the password is strong */
     private static boolean isPasswordStrong(String password){
         String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
 
         return password.matches(pattern);
     }
 
+    /** Methods bellow are to return responses */
     private static Response<Status, FacePamphletProfile> notFound(){
         return new Response<>(Status.NotFound, null);
     }

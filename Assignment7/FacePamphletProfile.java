@@ -17,7 +17,9 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 	private String status;
 	private String imagePath;
 	private final Hashtable<String, FacePamphletProfile> friendList;
-	private final ArrayList<String> pendingRequests;
+	private final ArrayList<FacePamphletProfile> pendingRequests;
+	private final ArrayList<FacePamphletProfile> sentRequests;
+	private boolean isFriendListPublic;
 
 	public FacePamphletProfile(String name, String password){
 		this.name = name;
@@ -25,6 +27,8 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 
 		friendList = new Hashtable<>();
 		pendingRequests = new ArrayList<>();
+		sentRequests = new ArrayList<>();
+		isFriendListPublic = true;
 	}
 
 	public String getName() {
@@ -67,7 +71,7 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 		friendList.remove(name);
 	}
 
-	public Iterator<String> getPendingRequests(){
+	public Iterator<FacePamphletProfile> getPendingRequests(){
 		return pendingRequests.iterator();
 	}
 
@@ -75,19 +79,43 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 		return pendingRequests.size();
 	}
 
-	public void addPendingRequest(String name){
-		pendingRequests.add(name);
+	public void addPendingRequest(FacePamphletProfile profile){
+		pendingRequests.add(profile);
 	}
 
-	public void removePendingRequest(String name){
-		pendingRequests.remove(name);
+	public void removePendingRequest(FacePamphletProfile profile){
+		pendingRequests.remove(profile);
 	}
 
-	public boolean isFriend(String name){
-		return friendList.get(name) != null;
+	public boolean isFriend(FacePamphletProfile profile){
+		return friendList.get(profile.getName()) != null;
 	}
 
-	public boolean isPending(String name){
-		return pendingRequests.contains(name);
+	public boolean isPending(FacePamphletProfile profile){
+		return pendingRequests.contains(profile);
+	}
+
+	public boolean getIsFriendListPublic(){
+		return isFriendListPublic;
+	}
+
+	public void setIsFriendListPublic(boolean isFriendListPublic){
+		this.isFriendListPublic = isFriendListPublic;
+	}
+
+	public Iterator<FacePamphletProfile> getSentRequests(){
+		return sentRequests.iterator();
+	}
+
+	public int getSentRequestsCount(){
+		return sentRequests.size();
+	}
+
+	public void addSentRequest(FacePamphletProfile profile){
+		sentRequests.add(profile);
+	}
+
+	public void removeSentRequest(FacePamphletProfile profile) {
+		sentRequests.remove(profile);
 	}
 }
