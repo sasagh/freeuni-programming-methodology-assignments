@@ -57,7 +57,7 @@ public class FacePamphletCanvas extends GCanvas
 
 	/** Displays image */
 	private void displayImage(FacePamphletProfile profile) {
-		if (profile.getImagePath() == null) {
+		if (profile.getImagePath().isBlank()) {
 			GRect emptyRectangle = new GRect(IMAGE_WIDTH, IMAGE_HEIGHT);
 			add(emptyRectangle, LEFT_MARGIN, name.getY() + IMAGE_MARGIN);
 

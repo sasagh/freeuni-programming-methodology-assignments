@@ -71,6 +71,10 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 		return pendingRequests.iterator();
 	}
 
+	public int getPendingRequestsCount(){
+		return pendingRequests.size();
+	}
+
 	public void addPendingRequest(String name){
 		pendingRequests.add(name);
 	}

@@ -14,7 +14,7 @@ public interface FacePamphletConstants {
 	int APPLICATION_WIDTH = 1200;
 
 	/** The height of the application window */
-	int APPLICATION_HEIGHT = 750;
+	int APPLICATION_HEIGHT = 700;
 
 	/** Number of characters for each of the text input fields */
 	int TEXT_FIELD_SIZE = 15;
@@ -81,18 +81,31 @@ public interface FacePamphletConstants {
 	String COMMAND_DELETE_PROFILE = "Delete profile";
 	String COMMAND_CHANGE_STATUS = "Change status";
 	String COMMAND_CHANGE_PICTURE = "Change picture";
-	String COMMAND_SEND_FRIEND_REQUEST = "Send friend request";
-	String COMMAND_CANCEL_FRIEND_REQUEST = "Cancel friend request";
+	String COMMAND_REQUESTS_PENDING = "Friend requests (<COUNT>)";
+	String COMMAND_REQUEST_SEND = "Send friend request";
+	String COMMAND_REQUEST_CANCEL = "Cancel friend request";
+	String COMMAND_REQUEST_ACCEPT = "Accept";
+	String COMMAND_REQUEST_DECLINE = "Decline";
+	String COMMAND_CHANGE_PASSWORD = "Change password";
 	String COMMAND_REMOVE_FRIEND = "Remove friend";
 	String COMMAND_EXPORT_DATABASE = "Export Database";
+	String COMMAND_LOG_OUT = "Log out";
 
 	String MESSAGE_BAD_REQUEST = "Input must not be empty";
+	String MESSAGE_ADD_FRIEND_OR_NOT =
+			"Add <PROFILENAME> as a friend? Type 0 to decline request, 1 to accept and 2 to cancel";
+
+	String MESSAGE_COULD_NOT_ADD = "Sorry, something went wrong. Could not add <PROFILENAME> as a friend";
+	String MESSAGE_ENTER_CORRECT_NUMBER = "Enter correct number";
 
 	String MESSAGE_CHANGE_STATUS_SUCCESS = "Status updated to <STATUS>";
 	String MESSAGE_CHANGE_STATUS_NO_ACTIVE_PROFILE = "Please select a profile to change status";
 
 	String MESSAGE_CHANGE_PICTURE_SUCCESS = "Picture updated";
 	String MESSAGE_CHANGE_PICTURE_ERROR = "Unable to open image file: <FILENAME>";
+	String MESSAGE_FRIEND_REQUEST_SENT = "Friend request sent";
+	String MESSAGE_FRIEND_REQUEST_CANCEL = "Friend request cancenled";
+	String MESSAGE_FRIEND_REMOVED = "Friend removed";
 	String MESSAGE_CHANGE_PICTURE_NO_ACTIVE_PROFILE = "Please select a profile to change picture";
 
 	String MESSAGE_ADD_FRIEND_SUCCESS = "<FRIEND_NAME> added as a friend";
@@ -113,7 +126,7 @@ public interface FacePamphletConstants {
 					"It should be contain at least 8 symbols, one uppercase, one number and one special character";
 
 	enum Status{
-		Success, NotFound, BadRequest, AlreadyExists, WeakPassword, IncorrectPassword
+		Success, NotFound, AlreadyExists, WeakPassword, IncorrectPassword
 	}
 }
 

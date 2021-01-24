@@ -88,12 +88,19 @@ class FacePamphletService implements FacePamphletConstants{
     public static void addFriend(FacePamphletProfile friendProfile, FacePamphletProfile userProfile){
         userProfile.addFriend(friendProfile);
         friendProfile.addFriend(userProfile);
-        friendProfile.removePendingRequest(userProfile.getName());
+        userProfile.removePendingRequest(friendProfile.getName());
     }
 
     public static void removeFriend(FacePamphletProfile friendProfile, FacePamphletProfile userProfile){
         userProfile.removeFriend(friendProfile.getName());
         friendProfile.removeFriend(userProfile.getName());
+    }
+
+    public static Response<Status, FacePamphletProfile> changePassword(String password, FacePamphletProfile profile){
+        if(!isPasswordStrong(password)) return weakPassword();
+        profile.setPassword(hashString(password));
+
+        return success(profile);
     }
 
     private static String hashString(String input){
