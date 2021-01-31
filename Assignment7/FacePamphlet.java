@@ -34,6 +34,8 @@ public class FacePamphlet extends Program
 	private JButton removeFriendBtn;
 	private JButton exportDatabaseBtn;
 	private JButton changePasswordBtn;
+	private JButton userProfileBtn;
+	private JButton guestsBtn;
 
 	private FacePamphletProfile userProfile;
 	private FacePamphletProfile currentProfile;
@@ -60,7 +62,7 @@ public class FacePamphlet extends Program
 		canvas.displayProfile(currentProfile, getFriendsToDisplay());
 
 		initializeInteractors();
-		addActionCommandsToInteractors();
+		addActionCommands();
 		addActionListenersToInteractors();
 		setButtonVisibility();
 		addInteractorsToProgram();
@@ -84,7 +86,8 @@ public class FacePamphlet extends Program
 		}
 
 		while(true){
-			boolean login = getDialog().readBoolean(DIALOG_MESSAGE_LOGIN_OR_REGISTER, "Log in", "Register");
+			boolean login = getDialog()
+					.readBoolean(DIALOG_MESSAGE_LOGIN_OR_REGISTER, "Log in", "Register");
 			if(login ? login() : register()) break;
 		}
 	}
@@ -150,11 +153,12 @@ public class FacePamphlet extends Program
 		nameTextField = new JTextField(TEXT_FIELD_SIZE);
 		changeStatusTextField = new JTextField(TEXT_FIELD_SIZE);
 		changePictureTextField = new JTextField(TEXT_FIELD_SIZE);
-
+		userProfileBtn = new JButton(COMMAND_MY_PROFILE);
 		lookupBtn = new JButton(COMMAND_LOOKUP);
 		refreshBtn = new JButton(COMMAND_REFRESH);
 		changeStatusBtn = new JButton(COMMAND_CHANGE_STATUS);
 		changePictureBtn = new JButton(COMMAND_CHANGE_PICTURE);
+		guestsBtn = new JButton(getGuestsText());
 		requestsPendingBtn = new JButton(getPendingRequestsBtnText());
 		requestsSentBtn = new JButton(getSentRequestsBtnText());
 		requestSendBtn = new JButton(COMMAND_REQUEST_SEND);
@@ -169,11 +173,12 @@ public class FacePamphlet extends Program
 	}
 
 	/** Adds action commands to interactors */
-	private void addActionCommandsToInteractors() {
+	private void addActionCommands() {
 		changeStatusTextField.setActionCommand(COMMAND_CHANGE_STATUS);
 		changePictureTextField.setActionCommand(COMMAND_CHANGE_PICTURE);
 		nameTextField.setActionCommand(COMMAND_LOOKUP);
 
+		guestsBtn.setActionCommand(COMMAND_GUESTS);
 		requestsPendingBtn.setActionCommand(COMMAND_REQUESTS_PENDING);
 		requestsSentBtn.setActionCommand(COMMAND_REQUESTS_SENT);
 		changeFriendListPrivacyBtn.setActionCommand(COMMAND_FRIEND_LIST_PRIVACY);
@@ -185,10 +190,12 @@ public class FacePamphlet extends Program
 		changePictureTextField.addActionListener(this);
 		nameTextField.addActionListener(this);
 
+		userProfileBtn.addActionListener(this);
 		lookupBtn.addActionListener(this);
 		refreshBtn.addActionListener(this);
 		changeStatusBtn.addActionListener(this);
 		changePictureBtn.addActionListener(this);
+		guestsBtn.addActionListener(this);
 		requestsPendingBtn.addActionListener(this);
 		requestsSentBtn.addActionListener(this);
 		requestSendBtn.addActionListener(this);
@@ -204,13 +211,16 @@ public class FacePamphlet extends Program
 
 	/** Adds interactors in program */
 	private void addInteractorsToProgram() {
+		add(userProfileBtn, NORTH);
+		add(new JLabel(STRING_WITH_WHITESPACES), NORTH);
+
 		add(nameLabel, NORTH);
 		add(nameTextField, NORTH);
 		add(lookupBtn, NORTH);
-		add(new JLabel(EMPTY_LABEL_TEXT), NORTH);
+		add(new JLabel(STRING_WITH_WHITESPACES), NORTH);
 
 		add(refreshBtn, NORTH);
-		add(new JLabel(EMPTY_LABEL_TEXT), NORTH);
+		add(new JLabel(STRING_WITH_WHITESPACES), NORTH);
 
 		add(exportDatabaseBtn, NORTH);
 
@@ -221,6 +231,9 @@ public class FacePamphlet extends Program
 
 		add(changePictureTextField, WEST);
 		add(changePictureBtn, WEST);
+		addEmptyLabel();
+
+		add(guestsBtn, WEST);
 		addEmptyLabel();
 
 		add(requestsPendingBtn, WEST);
@@ -248,10 +261,12 @@ public class FacePamphlet extends Program
 		if(!isProfileActive && !event.getActionCommand().equals(COMMAND_EXPORT_DATABASE)) return;
 
 		switch (event.getActionCommand()){
+			case COMMAND_MY_PROFILE -> actionMyProfile();
 			case COMMAND_LOOKUP -> actionLookup();
 			case COMMAND_REFRESH -> actionRefresh();
 			case COMMAND_CHANGE_STATUS -> actionChangeStatus();
 			case COMMAND_CHANGE_PICTURE -> actionChangePicture();
+			case COMMAND_GUESTS -> actionGuests();
 			case COMMAND_REQUEST_SEND -> actionRequestSend();
 			case COMMAND_REQUEST_CANCEL -> actionRequestCancel();
 			case COMMAND_REQUEST_ACCEPT -> actionRequestAccept();
@@ -269,6 +284,11 @@ public class FacePamphlet extends Program
 	}
 
 	/** Methods bellow are for actions */
+	private void actionMyProfile(){
+		currentProfile = userProfile;
+		canvas.displayProfile(currentProfile, getFriendsToDisplay());
+	}
+
 	private void actionLookup(){
 		String name = nameTextField.getText();
 
@@ -285,6 +305,7 @@ public class FacePamphlet extends Program
 		}
 
 		currentProfile = response.data;
+		currentProfile.addGuest(userProfile);
 		canvas.displayProfile(currentProfile, getFriendsToDisplay());
 		handleSouthButtons();
 	}
@@ -326,6 +347,13 @@ public class FacePamphlet extends Program
 		}
 	}
 
+	private void actionGuests(){
+		currentProfile = userProfile;
+		userProfile.resetNotSeenGuestsCount();
+		canvas.showGuests(userProfile.getGuests());
+		guestsBtn.setText(getGuestsText());
+	}
+
 	private void actionRequestsSent() {
 		Iterator<FacePamphletProfile> it = userProfile.getSentRequests();
 
@@ -336,7 +364,7 @@ public class FacePamphlet extends Program
 			boolean cancel = getDialog()
 					.readBoolean(
 							DIALOG_MESSAGE_REQUEST_SENT_CANCEL
-							.replace("<PROFILENAME>", profile.getName()), "Yes", "NO"
+							.replace("<PROFILENAME>", profile.getName()), "Yes", "No"
 					);
 
 			if(cancel) toCancel.add(profile);
@@ -348,13 +376,15 @@ public class FacePamphlet extends Program
 	}
 
 	private void actionDeleteProfile(){
-		boolean shouldDelete = getDialog().readBoolean(DIALOG_MESSAGE_DELETE_CONFIRMATION, "Yes", "No");
+		boolean shouldDelete = getDialog()
+				.readBoolean(DIALOG_MESSAGE_DELETE_CONFIRMATION, "Yes", "No");
 
 		if(shouldDelete){
 			canvas.removeAll();
 			isProfileActive = false;
 			requestsPendingBtn.setText(COMMAND_REQUESTS_PENDING.replace(" (<COUNT>)", ""));
 			requestsSentBtn.setText(COMMAND_REQUESTS_SENT.replace(" (<COUNT>)", ""));
+			guestsBtn.setText(COMMAND_GUESTS.replace(" (<COUNT>)", ""));
 			FacePamphletService.deleteProfile(userProfile);
 			canvas.showMessage(MESSAGE_PROFILE_DELETED);
 		}
@@ -541,8 +571,13 @@ public class FacePamphlet extends Program
 		return friendsToDisplay;
 	}
 
-	/** Adds empty label to south */
+	/** Adds empty label to west */
 	private void addEmptyLabel(){
 		add(new JLabel(EMPTY_LABEL_TEXT), WEST);
+	}
+
+	private String getGuestsText(){
+		return COMMAND_GUESTS
+				.replace("<COUNT>", ""+userProfile.getNotSeenGuestsCount());
 	}
 }

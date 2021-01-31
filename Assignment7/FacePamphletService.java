@@ -158,6 +158,11 @@ class FacePamphletService implements FacePamphletConstants{
         return mutualFriends;
     }
 
+    /** Method for checking if profile exists */
+    public static boolean profileExists(String name){
+        return db.getProfileByName(name) != null;
+    }
+
     /** Method for hashing string */
     private static String hashString(String input){
         try{
@@ -180,11 +185,6 @@ class FacePamphletService implements FacePamphletConstants{
     /** Method for checking credentials */
     private static boolean isCredentialsCorrect(String name, String password, FacePamphletProfile profile){
         return profile.getName().equals(name) && profile.getPasswordHash().equals(hashString(password));
-    }
-
-    /** Method for checking if profile exists */
-    private static boolean profileExists(String name){
-        return db.getProfileByName(name) != null;
     }
 
     /** Method for checking if the password is strong */

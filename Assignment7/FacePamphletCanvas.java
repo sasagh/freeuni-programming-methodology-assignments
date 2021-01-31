@@ -27,6 +27,23 @@ public class FacePamphletCanvas extends GCanvas
 		add(message, getWidth()/2.0 - message.getWidth()/2, getHeight() - BOTTOM_MESSAGE_MARGIN);
 	}
 
+	public void showGuests(Iterator<FacePamphletProfile> it){
+		removeAll();
+		GLabel guestsLabel = new GLabel("Guests:");
+		guestsLabel.setFont(PROFILE_FRIEND_LABEL_FONT);
+		add(guestsLabel, getWidth()/5.0, name.getY() + IMAGE_MARGIN);
+
+		double margin = 0;
+
+		while(it.hasNext()){
+			FacePamphletProfile guest = it.next();
+			String labelText = FacePamphletService.profileExists(guest.getName()) ? guest.getName() : "Deleted user";
+			GLabel guestLabel = new GLabel(labelText);
+			guestLabel.setFont(PROFILE_FRIEND_FONT);
+			add(guestLabel, getWidth() / 5.0, guestsLabel.getY() + guestLabel.getHeight() + margin);
+			margin += guestLabel.getHeight();
+		}
+	}
 
 	/**
 	 * This method displays the given profile on the canvas.  The

@@ -75,10 +75,14 @@ public interface FacePamphletConstants {
 	 *  in the profile */
 	double STATUS_MARGIN = 20;
 
+	String STRING_WITH_WHITESPACES = "     ";
+
+	String COMMAND_MY_PROFILE = "My profile";
 	String COMMAND_LOOKUP = "Lookup";
 	String COMMAND_DELETE_PROFILE = "Delete profile";
 	String COMMAND_CHANGE_STATUS = "Change status";
 	String COMMAND_CHANGE_PICTURE = "Change picture";
+	String COMMAND_GUESTS = "Gostebi (<COUNT>)";
 	String COMMAND_REQUESTS_PENDING = "Pending requests (<COUNT>)";
 	String COMMAND_REQUESTS_SENT = "Sent requests (<COUNT>)";
 	String COMMAND_REQUEST_SEND = "Send friend request";

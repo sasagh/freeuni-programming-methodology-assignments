@@ -19,6 +19,8 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 	private final Hashtable<String, FacePamphletProfile> friendList;
 	private final ArrayList<FacePamphletProfile> pendingRequests;
 	private final ArrayList<FacePamphletProfile> sentRequests;
+	private final ArrayList<FacePamphletProfile> guests;
+	private int notSeenGuestsCount = 0;
 	private boolean isFriendListPublic;
 
 	public FacePamphletProfile(String name, String password){
@@ -28,6 +30,7 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 		friendList = new Hashtable<>();
 		pendingRequests = new ArrayList<>();
 		sentRequests = new ArrayList<>();
+		guests = new ArrayList<>();
 		isFriendListPublic = true;
 	}
 
@@ -117,5 +120,24 @@ public class FacePamphletProfile implements FacePamphletConstants, Serializable 
 
 	public void removeSentRequest(FacePamphletProfile profile) {
 		sentRequests.remove(profile);
+	}
+
+	public int getNotSeenGuestsCount(){
+		return notSeenGuestsCount;
+	}
+
+	public void resetNotSeenGuestsCount(){
+		notSeenGuestsCount = 0;
+	}
+
+	public void addGuest(FacePamphletProfile profile){
+		if(guests.contains(profile)) return;
+
+		guests.add(0, profile);
+		notSeenGuestsCount++;
+	}
+
+	public Iterator<FacePamphletProfile> getGuests(){
+		return guests.iterator();
 	}
 }
